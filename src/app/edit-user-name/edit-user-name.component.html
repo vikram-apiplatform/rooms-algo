@@ -7,7 +7,6 @@
       </span></div>
 </div>
 <div class="container-fluid">
-  <p style="font-size: 12px;color: darkslategrey;font-weight: 300;">Total Number of Customer : {{total_users}}</p>
   <div class="col-12 row d-flex">
     <mat-form-field class="col-3" appearance="outline">
       <mat-label>Customer Name</mat-label>
@@ -35,12 +34,11 @@
     </mat-form-field>
 
     <div class="col-1">
-      <button style="width: 100%;margin-top: 10px;" mat-raised-button color="primary" (click)="add()">Add</button>
+      <button *ngIf="!editFlag" style="width: 100%;margin-top: 10px;" mat-raised-button color="primary" (click)="add()">Add</button>
+      <button *ngIf="editFlag" style="width: 100%;margin-top: 10px;" mat-raised-button color="primary" (click)="update()">Update</button>
     </div>
   </div>
   <div *ngIf="usersList.length > 0">
-    <span style="color: red;font-size: 12px;"
-          *ngIf="usersList.length == total_users"> (Customers Full) </span>
     <table class="table table-striped">
       <thead>
       <tr>
@@ -48,6 +46,7 @@
         <th scope="col">Maximum Allowable Buildings</th>
         <th scope="col">Maximum Allowable Rooms</th>
         <th scope="col">Buildings #</th>
+        <th scope="col">Actions</th>
       </tr>
       </thead>
       <tbody>
@@ -56,6 +55,10 @@
         <td>{{user.max_allowable_buildings}}</td>
         <td>{{user.max_allowable_rooms}}</td>
         <td>{{user.selected_buildings}}</td>
+        <td>
+          <mat-icon style="cursor: pointer;font-size: 18px;" matTooltip="Edit" (click)="editUser(i)">edit</mat-icon>
+          <mat-icon style="cursor: pointer;font-size: 18px;margin-left: 5px;" matTooltip="Remove" (click)="removeUser(i)">remove_circle</mat-icon>
+        </td>
       </tr>
 
       </tbody>
@@ -63,7 +66,7 @@
   </div>
   <div class="col-12 row" style="margin-top: 2rem">
     <button class="col-1" mat-raised-button color="primary" (click)="save()">Save</button>
-    <button class="col-1" style="margin-left: 1rem;" mat-raised-button color="primary" (click)="closeDialog()">Cancel
+    <button class="col-1" style="margin-left: 1rem;" mat-raised-button color="primary" (click)="cancel()">Cancel
     </button>
 
   </div>

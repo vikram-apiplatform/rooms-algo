@@ -172,17 +172,20 @@ export class RoomsComponent implements OnInit {
   addUsers() {
     console.log(this.users);
     const dialogRef = this.dialog.open(EditUserNameComponent, {
-      width: '30vw',
+      width: '80vw',
       minHeight: '30vh',
       maxHeight: '90vh',
       data: {
-        total_users: this.users
+        total_users: this.users,
+        total_buildings: this.buildings,
+        rooms_per_building: this.roomsPerBuilding
       },
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.userList) {
         this.usersList = result.userList;
+        console.log(this.usersList);
       } else {
         this.usersList = Array(this.users).fill(0).map((x, i) => i + 1);
       }

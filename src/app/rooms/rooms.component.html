@@ -1,18 +1,18 @@
 <div class="container-fluid">
   <div class="d-flex flex-row">
-    <div class="p-2 col-3">
+    <div class="p-2 col-4">
       <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
         <mat-label>Total Rooms</mat-label>
         <input matInput type="number" [(ngModel)]="rooms" (ngModelChange)="roomsValueChange()" required>
       </mat-form-field>
     </div>
-    <div class="p-2 col-3">
+    <div class="p-2 col-4">
       <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
         <mat-label>Total Buildings</mat-label>
         <input matInput type="number" [(ngModel)]="buildings" (ngModelChange)="buildingsValueChange()" required>
       </mat-form-field>
     </div>
-    <div class="p-2 col-3">
+    <div class="p-2 col-4">
       <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
         <mat-label>Rooms per Building</mat-label>
         <input matInput [value]="roomsPerBuilding" required disabled>
@@ -21,42 +21,44 @@
 
   </div>
   <div class="d-flex flex-row">
-<!--    <div class="p-2 col-3">-->
-<!--      <mat-form-field class="example-form-field" appearance="outline" style="width:100%">-->
-<!--        <mat-label>Maximum Allowable Buildings</mat-label>-->
-<!--        <input matInput type="number" [(ngModel)]="maxAllowableBuildings"-->
-<!--               (ngModelChange)="maxAllowableBuildingsValueChange()" required>-->
-<!--      </mat-form-field>-->
-<!--    </div>-->
+    <!--    <div class="p-2 col-3">-->
+    <!--      <mat-form-field class="example-form-field" appearance="outline" style="width:100%">-->
+    <!--        <mat-label>Maximum Allowable Buildings</mat-label>-->
+    <!--        <input matInput type="number" [(ngModel)]="maxAllowableBuildings"-->
+    <!--               (ngModelChange)="maxAllowableBuildingsValueChange()" required>-->
+    <!--      </mat-form-field>-->
+    <!--    </div>-->
 
-<!--    <div class="p-2 col-3">-->
-<!--      <mat-form-field class="example-form-field" appearance="outline" style="width:100%">-->
-<!--        <mat-label>Maximum Allowable Rooms</mat-label>-->
-<!--        <input matInput [value]="maxAllowableRooms" required disabled>-->
-<!--      </mat-form-field>-->
-<!--    </div>-->
-    <div class="p-2 col-3">
+    <!--    <div class="p-2 col-3">-->
+    <!--      <mat-form-field class="example-form-field" appearance="outline" style="width:100%">-->
+    <!--        <mat-label>Maximum Allowable Rooms</mat-label>-->
+    <!--        <input matInput [value]="maxAllowableRooms" required disabled>-->
+    <!--      </mat-form-field>-->
+    <!--    </div>-->
+    <div class="p-2 col-4">
       <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
         <mat-label>No. of Days</mat-label>
         <input matInput type="number" [(ngModel)]="days" (ngModelChange)="daysValueChange()" required>
       </mat-form-field>
     </div>
 
-    <div class="p-2 col-3">
+    <div class="p-2 col-4">
       <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
         <mat-label>No. of Users</mat-label>
-        <input matInput type="number" [(ngModel)]="users" (ngModelChange)="usersValueChange()"required>
+        <input matInput type="number" [(ngModel)]="users" (ngModelChange)="usersValueChange()" required>
       </mat-form-field>
     </div>
-    <div class="p-2 col-6 text-right">
-      <button style="margin-top: 10px;" mat-raised-button color="primary" (click)="addUsers()">Add Users</button>
-      <button style="margin-top: 10px;margin-left: 1rem;" mat-raised-button color="primary" (click)="assignRoom()">Assign Rooms</button>
+    <div class="p-2 col-4 text-right">
+      <button style="margin-top: 10px;" mat-raised-button color="primary" (click)="addUsers()">Manage</button>
+      <button style="margin-top: 10px;margin-left: 1rem;" mat-raised-button color="primary" (click)="assignRoom()">
+        Assign
+      </button>
       <button style="margin-top: 10px;margin-left: 1rem;" mat-raised-button color="primary"
               (click)="room_allocated = [];selected_buildings=[]">Clear
       </button>
-<!--      <button style="margin-top: 10px;margin-left: 1rem;" mat-raised-button color="primary"-->
-<!--              (click)="editUserName()">Edit Users' Name-->
-<!--      </button>-->
+      <!--      <button style="margin-top: 10px;margin-left: 1rem;" mat-raised-button color="primary"-->
+      <!--              (click)="editUserName()">Edit Users' Name-->
+      <!--      </button>-->
     </div>
   </div>
   <div>
@@ -91,7 +93,7 @@
 
     <mat-menu #menu="matMenu">
       <button (click)="selectedUser(user)" mat-menu-item *ngFor="let user of usersList">
-        <span>{{user}}</span>
+        <span>{{user.name}}</span>
       </button>
     </mat-menu>
   </div>

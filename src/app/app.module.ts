@@ -18,6 +18,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatListModule} from "@angular/material/list";
+import {MatSelectModule} from "@angular/material/select";
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import {MatListModule} from "@angular/material/list";
     MatIconModule,
     MatTooltipModule,
     MatSnackBarModule,
-    MatListModule
+    MatListModule,
+    MatSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]

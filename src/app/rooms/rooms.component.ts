@@ -19,7 +19,110 @@ export class RoomsComponent implements OnInit {
   numberOfDays: number[];
   maxAllowableBuildings = 2;
   maxAllowableRooms: any;
-  usersList: any;
+  // usersList: any = [];
+  usersList: any = [
+    {
+      "name": "Vikram",
+      "max_allowable_buildings": 5,
+      "selected_buildings": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "max_allowable_rooms": 20
+    },
+    {
+      "name": "Vignesh",
+      "max_allowable_buildings": 3,
+      "selected_buildings": [
+        2,
+        4,
+        5
+      ],
+      "max_allowable_rooms": 12
+    },
+    {
+      "name": "Ram",
+      "max_allowable_buildings": 3,
+      "selected_buildings": [
+        2,
+        4,
+        5
+      ],
+      "max_allowable_rooms": 12
+    },
+    {
+      "name": "siva",
+      "max_allowable_buildings": 3,
+      "selected_buildings": [
+        2,
+        4,
+        5
+      ],
+      "max_allowable_rooms": 12
+    },
+    {
+      "name": "sri",
+      "max_allowable_buildings": 3,
+      "selected_buildings": [
+        2,
+        4,
+        5
+      ],
+      "max_allowable_rooms": 12
+    },
+    {
+      "name": "jeeva",
+      "max_allowable_buildings": 2,
+      "selected_buildings": [
+        1,
+        2
+      ],
+      "max_allowable_rooms": 8
+    },
+    {
+      "name": "tarun",
+      "max_allowable_buildings": 2,
+      "selected_buildings": [
+        1,
+        2
+      ],
+      "max_allowable_rooms": 8
+    },
+    {
+      "name": "rohan",
+      "max_allowable_buildings": 2,
+      "selected_buildings": [
+        1,
+        2
+      ],
+      "max_allowable_rooms": 8
+    },
+    {
+      "name": "muthu",
+      "max_allowable_buildings": 4,
+      "selected_buildings": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "max_allowable_rooms": 16
+    },
+    {
+      "name": "saldin",
+      "max_allowable_buildings": 4,
+      "selected_buildings": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "max_allowable_rooms": 16
+    }
+  ];
   room_allocated: any = [];
   selected_buildings: any = [];
   rooms_not_seleted: any = [];
@@ -87,11 +190,12 @@ export class RoomsComponent implements OnInit {
   }
 
   cellClicked(row: any, column: any) {
-    console.log(row, column)
+    // console.log(row, column)
     this.rowClicked = {
       row: row,
       column: column
     };
+    console.log('Building', this.getBuildingNumber(row + 1) - 1)
   }
 
   checkboxChanged(row: any, event: any) {
@@ -156,7 +260,8 @@ export class RoomsComponent implements OnInit {
     let obj: any = {
       row: this.rowClicked.row,
       column: this.rowClicked.column - 1,
-      value: user
+      value: user.name,
+      user_details: user
     };
     this.selectedValues.push(obj);
 
@@ -167,6 +272,16 @@ export class RoomsComponent implements OnInit {
     this.dialog.open(EditUserNameComponent, {
       data: this.usersName,
     });
+  }
+
+  getUserList() {
+    let temp = [];
+    for (let user of this.usersList) {
+      if (user.selected_buildings.includes(this.getBuildingNumber(this.rowClicked.row + 1) - 1)) {
+        temp.push(user)
+      }
+    }
+    return temp;
   }
 
   addUsers() {

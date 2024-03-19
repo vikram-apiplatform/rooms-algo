@@ -65,8 +65,8 @@
     <table class="table table-striped table-bordered">
       <thead>
       <tr>
-        <th scope="col">#</th>
-        <th scope="col">Room</th>
+        <th scope="col">Building #</th>
+        <th scope="col">Room #</th>
         <th scope="col" *ngFor="let day of numberOfDays">Day {{day}}</th>
       </tr>
       </thead>
@@ -75,7 +75,6 @@
       <ng-container *ngFor="let rowIndex of numberOfRows;">
         <tr *ngIf="rowIndex % roomsPerBuilding === 0">
           <td [attr.rowspan]="roomsPerBuilding">
-            <mat-checkbox (change)="checkboxChanged(getBuildingNumber(rowIndex),$event)"></mat-checkbox>
             Building {{getBuildingNumber(rowIndex)}} </td>
           <td>Room {{rowIndex + 1}}</td>
           <td *ngFor="let day of numberOfDays" (click)="cellClicked(rowIndex, day)"
@@ -92,7 +91,7 @@
     </table>
 
     <mat-menu #menu="matMenu">
-      <button (click)="selectedUser(user)" mat-menu-item *ngFor="let user of usersList">
+      <button (click)="selectedUser(user)" mat-menu-item *ngFor="let user of getUserList()">
         <span>{{user.name}}</span>
       </button>
     </mat-menu>

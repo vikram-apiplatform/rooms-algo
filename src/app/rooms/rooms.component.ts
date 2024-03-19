@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ApiService} from "../api.service";
+import {MatDialog} from "@angular/material/dialog";
+import {EditUserNameComponent} from "../edit-user-name/edit-user-name.component";
 
 @Component({
   selector: 'app-rooms',
@@ -21,6 +23,7 @@ export class RoomsComponent implements OnInit {
   room_allocated: any = [];
   selected_buildings: any = [];
   rooms_not_seleted: any = [];
+  usersName: any = [];
 
 
   selectedBuilding: any = [];
@@ -28,12 +31,13 @@ export class RoomsComponent implements OnInit {
   selectedValues: any = [];
 
 
-  constructor(private apiService: ApiService) {
+  constructor(private apiService: ApiService,
+              public dialog: MatDialog) {
     this.roomsPerBuilding = this.rooms / this.buildings;
     this.maxAllowableRooms = this.maxAllowableBuildings * this.roomsPerBuilding;
     this.numberOfRows = Array(this.rooms).fill(0).map((x, i) => i);
     this.numberOfDays = Array(this.days).fill(0).map((x, i) => i + 1);
-    this.usersList = Array(this.users).fill(0).map((x, i) => i + 1);
+    this.usersName = Array(this.users).fill(0).map((x, i) => 'user ' + (i + 1).toString());
     console.log(this.numberOfRows)
     this.buildingsValueChange();
   }
@@ -41,8 +45,9 @@ export class RoomsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  usersValueChange(){
+  usersValueChange() {
     this.usersList = Array(this.users).fill(0).map((x, i) => i + 1);
+    this.usersName = Array(this.users).fill(0).map((x, i) => 'user ' + (i + 1).toString());
   }
 
   maxAllowableBuildingsValueChange() {
@@ -101,13 +106,16 @@ export class RoomsComponent implements OnInit {
       for (let item of this.selectedValues) {
         if (item.row == row && item.column == column - 1) {
           flag = true;
-          return 'user ' + item.value;
+          // return 'user ' + item.value;
+          return item.value;
         }
       }
     }
     if (!flag) {
       if (this.room_allocated.length > 0) {
-        return this.room_allocated[row][column - 1] != 0 ? 'user ' + this.room_allocated[row][column - 1] : '';
+        console.log(this.usersName[this.room_allocated[row][column - 1] - 1]);
+        // return this.room_allocated[row][column - 1] != 0 ? 'user ' + this.room_allocated[row][column - 1] : '';
+        return this.room_allocated[row][column - 1] != 0 ? this.usersName[this.room_allocated[row][column - 1] - 1] : '';
       } else {
         return '';
       }
@@ -153,6 +161,32 @@ export class RoomsComponent implements OnInit {
     this.selectedValues.push(obj);
 
     console.log(this.selectedValues);
+  }
+
+  editUserName() {
+    this.dialog.open(EditUserNameComponent, {
+      data: this.usersName,
+    });
+  }
+
+  addUsers() {
+    console.log(this.users);
+    const dialogRef = this.dialog.open(EditUserNameComponent, {
+      width: '30vw',
+      minHeight: '30vh',
+      maxHeight: '90vh',
+      data: {
+        total_users: this.users
+      },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.userList) {
+        this.usersList = result.userList;
+      } else {
+        this.usersList = Array(this.users).fill(0).map((x, i) => i + 1);
+      }
+    });
   }
 
 }

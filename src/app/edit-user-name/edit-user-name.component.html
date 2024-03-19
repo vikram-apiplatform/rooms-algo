@@ -1,0 +1,37 @@
+<div class=" col-12 d-flex">
+  <div class="col-11"><p style="font-weight: bolder;margin-top: 5px;">
+    Add Users
+  </p></div>
+  <div><span>
+    <mat-icon style="cursor: pointer" matTooltip="close" aria-hidden="false" aria-label="Close" (click)="closeDialog()">close</mat-icon>
+      </span></div>
+</div>
+<div class="container-fluid">
+  <p style="font-size: 12px;color: darkslategrey;font-weight: 300;">Total Number of Users : {{total_users}}</p>
+  <div class="col-12 row d-flex">
+    <mat-form-field class="col-10" appearance="outline">
+      <mat-label>User Name</mat-label>
+      <input matInput type="text" [(ngModel)]="username" required (keyup.enter)="add()">
+    </mat-form-field>
+    <div class="col-2">
+      <button style="width: 100%;margin-top: 10px;" mat-raised-button color="primary" (click)="add()">Add</button>
+    </div>
+  </div>
+  <div *ngIf="usersList.length > 0">
+    <p>Users List <span style="color: red;font-size: 12px;" *ngIf="usersList.length == total_users"> (List Full) </span></p>
+    <mat-list role="list" style="max-height: 200px;overflow-y: auto;border: 0.5px solid #ccc;">
+      <mat-list-item style="height: 30px !important;font-size: 13px !important;"
+                     *ngFor="let user of usersList;let i=index" role="listitem">{{i + 1}}. {{user}}</mat-list-item>
+    </mat-list>
+  </div>
+  <div class="col-12 row" style="margin-top: 2rem">
+    <button class="col-2" mat-raised-button color="primary" (click)="save()">Save</button>
+    <button class="col-3" style="margin-left: 1rem;" mat-raised-button color="primary" (click)="closeDialog()">Cancel
+    </button>
+
+  </div>
+</div>
+
+
+
+

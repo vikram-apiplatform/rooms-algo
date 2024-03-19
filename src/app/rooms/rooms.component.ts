@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ApiService} from "../api.service";
+import {MatDialog} from "@angular/material/dialog";
+import {EditUserNameComponent} from "../edit-user-name/edit-user-name.component";
 
 @Component({
   selector: 'app-rooms',
@@ -8,42 +10,58 @@ import {ApiService} from "../api.service";
 })
 export class RoomsComponent implements OnInit {
 
-  rooms: any = 20;
+  rooms: any = 40;
   buildings: any = 5;
-  days: any = 10;
-  users: any = 10;
+  days: any = 20;
   roomsPerBuilding: any;
   numberOfRows: number[];
   numberOfDays: number[];
   maxAllowableBuildings = 2;
   maxAllowableRooms: any;
-  usersList: any;
+  // usersList: any = [];
+  usersList: any = [
+    {
+      "name": "Vikram",
+      "max_allowable_buildings": 5,
+      "selected_buildings": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "max_allowable_rooms": 20
+    },
+    {
+      "name": "Saldin",
+      "max_allowable_buildings": 3,
+      "selected_buildings": [
+        2,
+        4,
+        5
+      ],
+      "max_allowable_rooms": 12
+    }
+  ];
   room_allocated: any = [];
   selected_buildings: any = [];
-  rooms_not_seleted: any = [];
-
-
-  selectedBuilding: any = [];
   rowClicked: any = {};
   selectedValues: any = [];
 
 
-  constructor(private apiService: ApiService) {
+  constructor(private apiService: ApiService,
+              public dialog: MatDialog) {
     this.roomsPerBuilding = this.rooms / this.buildings;
     this.maxAllowableRooms = this.maxAllowableBuildings * this.roomsPerBuilding;
     this.numberOfRows = Array(this.rooms).fill(0).map((x, i) => i);
     this.numberOfDays = Array(this.days).fill(0).map((x, i) => i + 1);
-    this.usersList = Array(this.users).fill(0).map((x, i) => i + 1);
-    console.log(this.numberOfRows)
+    // console.log(this.numberOfRows)
     this.buildingsValueChange();
   }
 
   ngOnInit(): void {
   }
 
-  usersValueChange(){
-    this.usersList = Array(this.users).fill(0).map((x, i) => i + 1);
-  }
 
   maxAllowableBuildingsValueChange() {
     this.maxAllowableRooms = this.maxAllowableBuildings * this.roomsPerBuilding;
@@ -56,43 +74,34 @@ export class RoomsComponent implements OnInit {
 
   roomsValueChange() {
     this.numberOfRows = Array(this.rooms).fill(0).map((x, i) => i);
-    console.log(this.numberOfRows);
+    // console.log(this.numberOfRows);
     this.buildingsValueChange();
   }
 
   buildingsValueChange() {
     this.roomsPerBuilding = this.rooms / this.buildings;
     this.selected_buildings = [];
-    for (let i = 0; i < this.buildings; i++) {
-      let obj = {
-        checked: false
-      };
-      this.selected_buildings.push(obj)
-
-    }
-    console.log(this.selected_buildings);
-
-
     this.maxAllowableBuildingsValueChange();
   }
 
   getBuildingNumber(roomNumber: any) {
     this.roomsPerBuilding = this.rooms / this.buildings;
-    return Math.ceil(roomNumber / this.roomsPerBuilding) + 1
+    return Math.ceil(roomNumber / this.roomsPerBuilding) + 1;
   }
 
   cellClicked(row: any, column: any) {
-    console.log(row, column)
+    // console.log(row, column)
     this.rowClicked = {
       row: row,
       column: column
     };
+    // console.log('Building', this.getBuildingNumber(row + 1) - 1)
   }
 
   checkboxChanged(row: any, event: any) {
     // console.log(row, event.checked)
     this.selected_buildings[row - 1].checked = event.checked;
-    console.log(this.selected_buildings);
+    // console.log(this.selected_buildings);
   }
 
   getAllocatedValue(row: any, column: any) {
@@ -101,13 +110,15 @@ export class RoomsComponent implements OnInit {
       for (let item of this.selectedValues) {
         if (item.row == row && item.column == column - 1) {
           flag = true;
-          return 'user ' + item.value;
+          // return 'user ' + item.value;
+          return item.value;
         }
       }
     }
     if (!flag) {
       if (this.room_allocated.length > 0) {
-        return this.room_allocated[row][column - 1] != 0 ? 'user ' + this.room_allocated[row][column - 1] : '';
+        // return this.room_allocated[row][column - 1] != 0 ? 'user ' + this.room_allocated[row][column - 1] : '';
+        return this.room_allocated[row][column - 1] != null ? this.room_allocated[row][column - 1] : '';
       } else {
         return '';
       }
@@ -118,26 +129,42 @@ export class RoomsComponent implements OnInit {
 
   assignRoom() {
 
-    this.rooms_not_seleted = [];
-    for (let i = 1; i <= this.rooms; i++) {
-      let building_number = this.getBuildingNumber(i);
-      console.log(i, building_number)
-      if (this.selected_buildings && this.selected_buildings.length > 0 && !this.selected_buildings[building_number - 2].checked) {
-        this.rooms_not_seleted.push(i - 1);
-      }
-
+    let tempUsers = [];
+    for (let user of this.usersList) {
+      tempUsers.push(user.name);
     }
-    console.log(this.rooms_not_seleted);
+
+    let restrictions_list: any = []
+    for (let user of this.usersList) {
+      // console.log(user.name, user.selected_buildings);
+      let restrictions_obj: any = {
+        name: user.name,
+        restrictions: []
+      };
+      for (let building_number of user.selected_buildings) {
+        for (let i = 0; i < this.rooms; i++) {
+          // console.log(i, this.getBuildingNumber(i + 1) - 1)
+          if (building_number == this.getBuildingNumber(i + 1) - 1) {
+            restrictions_obj['restrictions'].push(i)
+          }
+        }
+      }
+      restrictions_list.push(restrictions_obj);
+    }
+    // console.log(restrictions_list);
+
+
     let payload = {
       rows: this.rooms,
       columns: this.days,
-      zero_rows: this.rooms_not_seleted,
-      users: this.usersList,
-      assignments: this.selectedValues
+      users: tempUsers,
+      assignments: this.selectedValues,
+      restrictions: restrictions_list
     };
     this.selectedValues = [];
+    // console.log(payload);
     this.apiService.get_rooms(payload).subscribe(res => {
-      console.log(res);
+      // console.log(res);
       if (res) {
         this.room_allocated = res;
       }
@@ -148,11 +175,58 @@ export class RoomsComponent implements OnInit {
     let obj: any = {
       row: this.rowClicked.row,
       column: this.rowClicked.column - 1,
-      value: user
+      value: user.name,
+      user_details: user
     };
     this.selectedValues.push(obj);
 
-    console.log(this.selectedValues);
+    // console.log(this.selectedValues);
   }
 
+
+  getUserList() {
+    let temp = [];
+    for (let user of this.usersList) {
+      if (user.selected_buildings.includes(this.getBuildingNumber(this.rowClicked.row + 1) - 1)) {
+        temp.push(user)
+      }
+    }
+    return temp;
+  }
+
+  addUsers() {
+    const dialogRef = this.dialog.open(EditUserNameComponent, {
+      width: '80vw',
+      minHeight: '30vh',
+      maxHeight: '90vh',
+      data: {
+        total_buildings: this.buildings,
+        rooms_per_building: this.roomsPerBuilding,
+        usersList: this.usersList
+      },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.userList) {
+        this.usersList = result.userList;
+        // console.log(this.usersList);
+      }
+    });
+  }
+
+
+  downloadTable() {
+    const table: any = document.querySelector('table');
+    const html = table.outerHTML;
+    const blob = new Blob([html], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'table.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 }

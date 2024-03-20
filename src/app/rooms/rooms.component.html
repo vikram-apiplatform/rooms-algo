@@ -28,6 +28,16 @@
   </div>
   <div class="d-flex flex-row">
     <div class="p-2 col-2">
+
+
+      <mat-form-field appearance="outline" style="width:100%">
+        <mat-label>Starting Date</mat-label>
+        <input matInput [matDatepicker]="picker" placeholder="MM/DD/YYYY" [(ngModel)]="startDate" (dateChange)="onDateChange($event)">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <div class="p-2 col-2">
       <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
         <mat-label>No. of users</mat-label>
         <input matInput type="number" [value]="usersList.length" disabled>
@@ -37,7 +47,7 @@
       <button style="margin-top: 10px;" mat-raised-button color="primary" (click)="addUsers()">Manage Users</button>
 
     </div>
-    <div class="p-2 col-5">
+    <div class="p-2 col-3">
     </div>
 
 
@@ -59,12 +69,12 @@
 
   </div>
   <div>
-    <table class="table table-striped table-bordered">
+    <table class="table table-striped table-bordered" style="    width: max-content;">
       <thead>
       <tr>
         <th scope="col">Building #</th>
         <th scope="col">Room #</th>
-        <th scope="col" *ngFor="let day of numberOfDays">Day {{day}}</th>
+        <th scope="col" *ngFor="let day of getColumnDays()">{{day}}</th>
       </tr>
       </thead>
       <tbody>
@@ -75,24 +85,22 @@
             Building {{getBuildingNumber(rowIndex)}} </td>
           <td>Room {{rowIndex + 1}}</td>
           <td *ngFor="let day of numberOfDays" (click)="cellClicked(rowIndex, day)"
-              > {{getAllocatedValue(rowIndex, day)}}</td>
-<!--              [matMenuTriggerFor]="menu"> {{getAllocatedValue(rowIndex, day)}}</td>-->
+              [matMenuTriggerFor]="menu"> {{getAllocatedValue(rowIndex, day)}}</td>
         </tr>
         <tr *ngIf="rowIndex % roomsPerBuilding !== 0">
           <td> Room {{ rowIndex + 1 }}</td>
           <td *ngFor="let day of numberOfDays" (click)="cellClicked(rowIndex, day)"
-              >  {{getAllocatedValue(rowIndex, day)}}
-<!--              [matMenuTriggerFor]="menu">  {{getAllocatedValue(rowIndex, day)}}-->
+              [matMenuTriggerFor]="menu">  {{getAllocatedValue(rowIndex, day)}}
           </td>
         </tr>
       </ng-container>
       </tbody>
     </table>
 
-<!--    <mat-menu #menu="matMenu">-->
-<!--      <button (click)="selectedUser(user)" mat-menu-item *ngFor="let user of getUserList()">-->
-<!--        <span>{{user.name}}</span>-->
-<!--      </button>-->
-<!--    </mat-menu>-->
+    <mat-menu #menu="matMenu">
+      <button (click)="selectedUser(user)" mat-menu-item *ngFor="let user of getUserList()">
+        <span>{{user.name}}</span>
+      </button>
+    </mat-menu>
   </div>
 </div>

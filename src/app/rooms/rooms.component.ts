@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ApiService} from "../api.service";
 import {MatDialog} from "@angular/material/dialog";
 import {EditUserNameComponent} from "../edit-user-name/edit-user-name.component";
+import {DatePipe} from "@angular/common";
 
 @Component({
   selector: 'app-rooms',
@@ -47,10 +48,15 @@ export class RoomsComponent implements OnInit {
   selected_buildings: any = [];
   rowClicked: any = {};
   selectedValues: any = [];
+  startDate:any = new Date();
+
+
+  buildings_list:any = [];
+  rooms_list:any = [];
 
 
   constructor(private apiService: ApiService,
-              public dialog: MatDialog) {
+              public dialog: MatDialog,private datePipe: DatePipe) {
     this.roomsPerBuilding = this.rooms / this.buildings;
     this.maxAllowableRooms = this.maxAllowableBuildings * this.roomsPerBuilding;
     this.numberOfRows = Array(this.rooms).fill(0).map((x, i) => i);
@@ -60,6 +66,32 @@ export class RoomsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // this.apiService.getBuildings().subscribe(res=>{
+    //   this.buildings_list = res;
+    // });
+    // this.apiService.getRooms().subscribe(res=>{
+    //   this.rooms_list = res;
+    //
+    // })
+  }
+
+  getColumnDays() {
+    let temp:any = [];
+
+    for(let i=0;i<this.days;i++) {
+      // let tempDate = this.datePipe.transform(this.startDate, 'MM-dd-yyyy');
+      const nextDate = new Date(this.startDate);
+      nextDate.setDate(this.startDate.getDate() + i);
+      temp.push(this.datePipe.transform(nextDate, 'MM-dd-yyyy'))
+    }
+    return temp;
+  }
+
+  onDateChange(event: any) {
+
+    console.log(this.startDate);
+    console.log(this.datePipe.transform(this.startDate, 'MM-dd-yyyy'));
+    // Do something with the selected date
   }
 
 

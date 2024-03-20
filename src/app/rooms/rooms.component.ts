@@ -1,8 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {ApiService} from "../api.service";
-import {MatDialog} from "@angular/material/dialog";
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {EditUserNameComponent} from "../edit-user-name/edit-user-name.component";
 import {DatePipe} from "@angular/common";
+import {MatSnackBar} from "@angular/material/snack-bar";
+
+
 
 @Component({
   selector: 'app-rooms',
@@ -12,7 +15,7 @@ import {DatePipe} from "@angular/common";
 export class RoomsComponent implements OnInit {
 
   rooms: any = 40;
-  buildings: any = 5;
+  buildings: any = 4;
   days: any = 20;
   roomsPerBuilding: any;
   numberOfRows: number[];
@@ -23,40 +26,45 @@ export class RoomsComponent implements OnInit {
   usersList: any = [
     {
       "name": "Vikram",
-      "max_allowable_buildings": 5,
+      "max_allowable_buildings": 4,
       "selected_buildings": [
         1,
         2,
         3,
-        4,
-        5
+        4
       ],
-      "max_allowable_rooms": 20
+      "max_allowable_rooms": 40
     },
     {
       "name": "Saldin",
-      "max_allowable_buildings": 3,
+      "max_allowable_buildings": 2,
       "selected_buildings": [
         2,
-        4,
-        5
+        4
       ],
-      "max_allowable_rooms": 12
+      "max_allowable_rooms": 20
     }
   ];
   room_allocated: any = [];
   selected_buildings: any = [];
   rowClicked: any = {};
   selectedValues: any = [];
-  startDate:any = new Date();
+  startDate: any = new Date();
 
 
-  buildings_list:any = [];
-  rooms_list:any = [];
+  buildings_list: any = [];
+  rooms_list: any = [];
+  selectedBuildings: any = [];
+  selectedPlan: any;
+  plans: any = [];
+  loading = false;
+  loading1 = false;
+
+  @ViewChild('excelTable', {static: false}) excelTable: any;
 
 
-  constructor(private apiService: ApiService,
-              public dialog: MatDialog,private datePipe: DatePipe) {
+  constructor(private apiService: ApiService, private _snackBar: MatSnackBar,
+              public dialog: MatDialog, private datePipe: DatePipe) {
     this.roomsPerBuilding = this.rooms / this.buildings;
     this.maxAllowableRooms = this.maxAllowableBuildings * this.roomsPerBuilding;
     this.numberOfRows = Array(this.rooms).fill(0).map((x, i) => i);
@@ -66,19 +74,142 @@ export class RoomsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.apiService.getBuildings().subscribe(res=>{
-    //   this.buildings_list = res;
-    // });
-    // this.apiService.getRooms().subscribe(res=>{
-    //   this.rooms_list = res;
-    //
-    // })
+    this.loading = true;
+    this.apiService.getBuildings().subscribe(res => {
+      this.buildings_list = res;
+      this.selectedBuildings = this.buildings_list;
+      this.loading = false;
+    });
+    this.apiService.getRooms().subscribe(res => {
+      this.rooms_list = res;
+      this.loading = false;
+    });
+    this.getPlans();
+  }
+
+  getPlans(){
+    this.apiService.getPlans().subscribe(res => {
+      this.plans = res;
+    });
+  }
+
+  isSelectionLimitReached(): boolean {
+    return this.selectedBuildings.length >= this.buildings;
+  }
+
+  exportToCsv(): void {
+    // Select the table element
+    let table: any = document.getElementById('htmlData');
+
+    // Initialize variables for CSV content and rows
+    let csvContent = '';
+    let rows = table.querySelectorAll('tr');
+
+    // Iterate over rows and columns to build CSV content
+    rows.forEach((row: any) => {
+      let rowData: any = [];
+      let rowIndex = 0;
+
+      row.querySelectorAll('td, th').forEach((cell: any) => {
+        let colspan = cell.getAttribute('colspan');
+        let rowspan = cell.getAttribute('rowspan');
+        let cellValue = cell.innerText;
+
+        // Check if the cell has rowspan
+        if (rowspan) {
+          let rowspanValue = parseInt(rowspan);
+          for (let i = 0; i < rowspanValue; i++) {
+            rowData[rowIndex + i] = cellValue;
+          }
+        } else {
+          rowData[rowIndex] = cellValue;
+        }
+
+        // Increment the row index by colspan value
+        if (colspan) {
+          rowIndex += parseInt(colspan);
+        } else {
+          rowIndex++;
+        }
+      });
+
+      csvContent += rowData.join(',') + '\n';
+    });
+
+    // Create a Blob object with CSV content
+    let blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+
+    // Create a temporary anchor element
+    let link = document.createElement('a');
+    if (link.download !== undefined) { // Check if the browser supports the download attribute
+      let url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'Rooms_Allocation_' + this.getCurrentDate() + '.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      console.error('Your browser does not support the HTML5 download attribute.');
+    }
+  }
+
+  getCurrentDate() {
+    const today = new Date();
+    let month: any = today.getMonth() + 1; // Months are zero-indexed, so we add 1
+    let day: any = today.getDate();
+    const year: any = today.getFullYear();
+
+    // Add leading zeros if necessary
+    if (month < 10) {
+      month = '0' + month;
+    }
+    if (day < 10) {
+      day = '0' + day;
+    }
+
+    return month + '/' + day + '/' + year;
+  }
+
+  save() {
+    let payload = {
+      name: "Plan",
+      createdAt: Date.now(),
+      total_rooms: this.rooms,
+      total_buildings: this.buildings,
+      total_days: this.days,
+      startDate: Date.parse(this.startDate),
+      users_details: this.usersList,
+      pre_assignments: this.selectedValues,
+      allocations: this.room_allocated
+    };
+    console.log(payload);
+
+
+    const dialogRef = this.dialog.open(SaveDialog, {
+      width: '350px',
+      data: {plan_name: ''},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        payload['name'] = result;
+        this.loading1 = true;
+        this.apiService.savePlan(payload).subscribe(res => {
+          this._snackBar.open('Plan saved successfully.', 'x', {
+            duration: 2000
+          });
+          this.loading1 = false;
+
+          this.getPlans();
+        })
+      }
+    });
   }
 
   getColumnDays() {
-    let temp:any = [];
+    let temp: any = [];
 
-    for(let i=0;i<this.days;i++) {
+    for (let i = 0; i < this.days; i++) {
       // let tempDate = this.datePipe.transform(this.startDate, 'MM-dd-yyyy');
       const nextDate = new Date(this.startDate);
       nextDate.setDate(this.startDate.getDate() + i);
@@ -94,7 +225,6 @@ export class RoomsComponent implements OnInit {
     // Do something with the selected date
   }
 
-
   maxAllowableBuildingsValueChange() {
     this.maxAllowableRooms = this.maxAllowableBuildings * this.roomsPerBuilding;
 
@@ -104,6 +234,20 @@ export class RoomsComponent implements OnInit {
     this.numberOfDays = Array(this.days).fill(0).map((x, i) => i + 1);
   }
 
+  onPlansChange() {
+    console.log(this.selectedPlan)
+    if (this.selectedPlan) {
+      this.selectedValues = [];
+      this.rooms = this.selectedPlan.total_rooms;
+      this.buildings = this.selectedPlan.total_buildings;
+      this.days = this.selectedPlan.total_days;
+      this.usersList = this.selectedPlan.users_details;
+      this.room_allocated = this.selectedPlan.allocations;
+      this.startDate = new Date(this.selectedPlan.startDate);
+      this.buildingsValueChange();
+    }
+  }
+
   roomsValueChange() {
     this.numberOfRows = Array(this.rooms).fill(0).map((x, i) => i);
     // console.log(this.numberOfRows);
@@ -111,6 +255,7 @@ export class RoomsComponent implements OnInit {
   }
 
   buildingsValueChange() {
+    this.selectedBuildings = [];
     this.roomsPerBuilding = this.rooms / this.buildings;
     this.selected_buildings = [];
     this.maxAllowableBuildingsValueChange();
@@ -119,6 +264,13 @@ export class RoomsComponent implements OnInit {
   getBuildingNumber(roomNumber: any) {
     this.roomsPerBuilding = this.rooms / this.buildings;
     return Math.ceil(roomNumber / this.roomsPerBuilding) + 1;
+  }
+
+  getRoomName(index: any) {
+    if (this.rooms_list) {
+      return this.rooms_list[index - 1]['name'];
+    }
+    return 'Room';
   }
 
   cellClicked(row: any, column: any) {
@@ -142,7 +294,6 @@ export class RoomsComponent implements OnInit {
       for (let item of this.selectedValues) {
         if (item.row == row && item.column == column - 1) {
           flag = true;
-          // return 'user ' + item.value;
           return item.value;
         }
       }
@@ -193,7 +344,7 @@ export class RoomsComponent implements OnInit {
       assignments: this.selectedValues,
       restrictions: restrictions_list
     };
-    this.selectedValues = [];
+    // this.selectedValues = [];
     // console.log(payload);
     this.apiService.get_rooms(payload).subscribe(res => {
       // console.log(res);
@@ -210,9 +361,11 @@ export class RoomsComponent implements OnInit {
       value: user.name,
       user_details: user
     };
-    this.selectedValues.push(obj);
+    if(!this.selectedValues.includes(obj)) {
+      this.selectedValues.push(obj);
+    }
 
-    // console.log(this.selectedValues);
+    console.log(this.selectedValues);
   }
 
 
@@ -262,3 +415,37 @@ export class RoomsComponent implements OnInit {
     URL.revokeObjectURL(url);
   }
 }
+
+
+@Component({
+  selector: 'save-dialog',
+  templateUrl: 'save.html',
+})
+export class SaveDialog {
+  constructor(
+    public dialogRef: MatDialogRef<SaveDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'special-reservation',
+  templateUrl: 'special-reservation.html',
+})
+export class SpecialReservationDialog {
+  constructor(
+    public dialogRef: MatDialogRef<SpecialReservationDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+}
+

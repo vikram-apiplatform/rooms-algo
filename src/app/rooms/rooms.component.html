@@ -12,13 +12,13 @@
     </div>
     <div class="p-2 col-3">
       <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
-        <mat-label>Total Rooms</mat-label>
+        <mat-label>மொத்த தொகுதி</mat-label>
         <input matInput type="number" [(ngModel)]="rooms" (ngModelChange)="roomsValueChange()" disabled required>
       </mat-form-field>
     </div>
     <div class="p-2 col-3">
       <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
-        <mat-label>Total Buildings</mat-label>
+        <mat-label>மொத்த மண்டலம்</mat-label>
         <input matInput type="number" [(ngModel)]="buildings" (ngModelChange)="buildingsValueChange()" disabled required>
       </mat-form-field>
     </div>
@@ -32,7 +32,7 @@
 
     <div class="p-2 col-3">
       <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
-        <mat-label>No. of Days</mat-label>
+        <mat-label>மொத்த நாட்கள்</mat-label>
         <input matInput type="number" [(ngModel)]="days" (ngModelChange)="daysValueChange()" required>
       </mat-form-field>
     </div>
@@ -49,12 +49,12 @@
     </div>
     <div class="p-2 col-2">
       <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
-        <mat-label>No. of users</mat-label>
+        <mat-label>மொத்த பேச்சாளர்கள்</mat-label>
         <input matInput type="number" [value]="usersList.length" disabled>
       </mat-form-field>
     </div>
     <div class="p-2 col-3">
-      <button style="margin-top: 10px;" mat-raised-button color="primary" (click)="addUsers()">Manage Users</button>
+      <button style="margin-top: 10px;" mat-raised-button color="primary" (click)="addUsers()">பேச்சாளர்கள்</button>
       <button disabled style="margin-top: 10px;margin-left: 5px;" mat-raised-button color="primary" (click)="addUsers()">Special Reservation</button>
 
     </div>
@@ -88,8 +88,8 @@
     <table #excelTable class="table table-striped table-bordered" style="width: max-content;">
       <thead>
       <tr>
-        <th scope="col">Building #</th>
-        <th scope="col">Room #</th>
+        <th scope="col">மண்டலம்</th>
+        <th scope="col">தொகுதி</th>
         <th scope="col" *ngFor="let day of getColumnDays()">{{day}}</th>
       </tr>
       </thead>
@@ -98,7 +98,7 @@
       <ng-container *ngFor="let rowIndex of numberOfRows;">
         <tr *ngIf="rowIndex % roomsPerBuilding === 0">
           <td [attr.rowspan]="roomsPerBuilding">
-            Building {{getBuildingNumber(rowIndex)}} </td>
+             {{getBuildingName(rowIndex)}} </td>
           <td> {{getRoomName(rowIndex + 1)}}</td>
           <td *ngFor="let day of numberOfDays" (click)="cellClicked(rowIndex, day)"
               [matMenuTriggerFor]="menu"> {{getAllocatedValue(rowIndex, day)}}</td>

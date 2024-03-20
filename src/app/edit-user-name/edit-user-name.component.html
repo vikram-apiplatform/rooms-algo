@@ -1,6 +1,6 @@
 <div class=" col-12 d-flex">
   <div class="col-11"><p style="font-weight: bolder;margin-top: 5px;">
-    Add Customers
+    பேச்சாளர் விவரம்
   </p></div>
   <div><span>
     <mat-icon style="cursor: pointer" matTooltip="close" aria-hidden="false" aria-label="Close" (click)="closeDialog()">close</mat-icon>
@@ -9,27 +9,27 @@
 <div class="container-fluid">
   <div class="col-12 row d-flex">
     <mat-form-field class="col-3" appearance="outline">
-      <mat-label>Customer Name</mat-label>
+      <mat-label>பேச்சாளர் பெயர்</mat-label>
       <input matInput type="text" [(ngModel)]="username" required (keyup.enter)="add()">
     </mat-form-field>
     <mat-form-field class="col-3" appearance="outline">
-      <mat-label>Maximum Allowable Buildings</mat-label>
+      <mat-label>அதிகபட்ச மண்டலம்</mat-label>
       <input matInput type="number" [(ngModel)]="allowale_buildings" [max]="total_buildings"
              (ngModelChange)="maxAllowableBuildingsValueChange()" required>
     </mat-form-field>
 
 
     <mat-form-field class="col-3" appearance="outline">
-      <mat-label>Choose Buildings</mat-label>
+      <mat-label>மண்டலத்தைத் தேர்ந்தெடுக்கவும்</mat-label>
       <mat-select multiple [(ngModel)]="selectedBuildings">
         <mat-option *ngFor="let num of range(1, total_buildings)" [value]="num"
                     [disabled]="isSelectionLimitReached() && !selectedBuildings.includes(num)">
-          Building #{{num}}
+          {{getName(num)}}
         </mat-option>
       </mat-select>
     </mat-form-field>
     <mat-form-field class="col-2" appearance="outline">
-      <mat-label>Allowable Rooms</mat-label>
+      <mat-label>அதிகபட்ச தொகுதி</mat-label>
       <input matInput type="number" [value]="allowable_rooms" disabled>
     </mat-form-field>
 
@@ -42,10 +42,10 @@
     <table class="table table-striped">
       <thead>
       <tr>
-        <th scope="col">Customer Name</th>
-        <th scope="col">Maximum Allowable Buildings</th>
-        <th scope="col">Maximum Allowable Rooms</th>
-        <th scope="col">Buildings #</th>
+        <th scope="col">பேச்சாளர் பெயர்</th>
+        <th scope="col">அதிகபட்ச மண்டலம்</th>
+        <th scope="col">அதிகபட்ச தொகுதி</th>
+        <th scope="col">மண்டலங்கள்</th>
         <th scope="col">Actions</th>
       </tr>
       </thead>
@@ -54,7 +54,7 @@
         <td>{{i+1}}. {{user.name}}</td>
         <td>{{user.max_allowable_buildings}}</td>
         <td>{{user.max_allowable_rooms}}</td>
-        <td>{{user.selected_buildings}}</td>
+        <td>{{getNamesList(user.selected_buildings)}}</td>
         <td>
           <mat-icon style="cursor: pointer;font-size: 18px;" matTooltip="Edit" (click)="editUser(i)">edit</mat-icon>
           <mat-icon style="cursor: pointer;font-size: 18px;margin-left: 5px;" matTooltip="Remove" (click)="removeUser(i)">remove_circle</mat-icon>

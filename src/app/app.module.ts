@@ -3,7 +3,7 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {RoomsComponent, SaveDialog} from './rooms/rooms.component';
+import {RoomsComponent, SaveDialog, SpecialReservationDialog} from './rooms/rooms.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatButtonModule} from "@angular/material/button";
 import {MatInputModule} from "@angular/material/input";
@@ -29,7 +29,8 @@ import {MatSidenavModule} from "@angular/material/sidenav";
     AppComponent,
     RoomsComponent,
     EditUserNameComponent,
-    SaveDialog
+    SaveDialog,
+    SpecialReservationDialog
   ],
   imports: [
     BrowserModule,
@@ -52,7 +53,7 @@ import {MatSidenavModule} from "@angular/material/sidenav";
     MatNativeDateModule,
     MatSidenavModule
   ],
-  providers: [DatePipe, SaveDialog],
+  providers: [DatePipe, SaveDialog, SpecialReservationDialog],
   bootstrap: [AppComponent]
 })
 export class AppModule {

@@ -1,9 +1,11 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {ApiService} from "../api.service";
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {EditUserNameComponent} from "../edit-user-name/edit-user-name.component";
 import {DatePipe} from "@angular/common";
 import {MatSnackBar} from "@angular/material/snack-bar";
+
+
 
 @Component({
   selector: 'app-rooms',
@@ -24,25 +26,23 @@ export class RoomsComponent implements OnInit {
   usersList: any = [
     {
       "name": "Vikram",
-      "max_allowable_buildings": 5,
+      "max_allowable_buildings": 4,
       "selected_buildings": [
         1,
         2,
         3,
-        4,
-        5
+        4
       ],
-      "max_allowable_rooms": 20
+      "max_allowable_rooms": 40
     },
     {
       "name": "Saldin",
-      "max_allowable_buildings": 3,
+      "max_allowable_buildings": 2,
       "selected_buildings": [
         2,
-        4,
-        5
+        4
       ],
-      "max_allowable_rooms": 12
+      "max_allowable_rooms": 20
     }
   ];
   room_allocated: any = [];
@@ -56,10 +56,14 @@ export class RoomsComponent implements OnInit {
   rooms_list: any = [];
   selectedBuildings: any = [];
   selectedPlan: any;
-  plans:any = [];
+  plans: any = [];
+  loading = false;
+  loading1 = false;
+
+  @ViewChild('excelTable', {static: false}) excelTable: any;
 
 
-  constructor(private apiService: ApiService,private _snackBar: MatSnackBar,
+  constructor(private apiService: ApiService, private _snackBar: MatSnackBar,
               public dialog: MatDialog, private datePipe: DatePipe) {
     this.roomsPerBuilding = this.rooms / this.buildings;
     this.maxAllowableRooms = this.maxAllowableBuildings * this.roomsPerBuilding;
@@ -70,13 +74,20 @@ export class RoomsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loading = true;
     this.apiService.getBuildings().subscribe(res => {
       this.buildings_list = res;
-      this.selectedBuildings = this.buildings_list
+      this.selectedBuildings = this.buildings_list;
+      this.loading = false;
     });
     this.apiService.getRooms().subscribe(res => {
       this.rooms_list = res;
+      this.loading = false;
     });
+    this.getPlans();
+  }
+
+  getPlans(){
     this.apiService.getPlans().subscribe(res => {
       this.plans = res;
     });
@@ -84,6 +95,79 @@ export class RoomsComponent implements OnInit {
 
   isSelectionLimitReached(): boolean {
     return this.selectedBuildings.length >= this.buildings;
+  }
+
+  exportToCsv(): void {
+    // Select the table element
+    let table: any = document.getElementById('htmlData');
+
+    // Initialize variables for CSV content and rows
+    let csvContent = '';
+    let rows = table.querySelectorAll('tr');
+
+    // Iterate over rows and columns to build CSV content
+    rows.forEach((row: any) => {
+      let rowData: any = [];
+      let rowIndex = 0;
+
+      row.querySelectorAll('td, th').forEach((cell: any) => {
+        let colspan = cell.getAttribute('colspan');
+        let rowspan = cell.getAttribute('rowspan');
+        let cellValue = cell.innerText;
+
+        // Check if the cell has rowspan
+        if (rowspan) {
+          let rowspanValue = parseInt(rowspan);
+          for (let i = 0; i < rowspanValue; i++) {
+            rowData[rowIndex + i] = cellValue;
+          }
+        } else {
+          rowData[rowIndex] = cellValue;
+        }
+
+        // Increment the row index by colspan value
+        if (colspan) {
+          rowIndex += parseInt(colspan);
+        } else {
+          rowIndex++;
+        }
+      });
+
+      csvContent += rowData.join(',') + '\n';
+    });
+
+    // Create a Blob object with CSV content
+    let blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+
+    // Create a temporary anchor element
+    let link = document.createElement('a');
+    if (link.download !== undefined) { // Check if the browser supports the download attribute
+      let url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'Rooms_Allocation_' + this.getCurrentDate() + '.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      console.error('Your browser does not support the HTML5 download attribute.');
+    }
+  }
+
+  getCurrentDate() {
+    const today = new Date();
+    let month: any = today.getMonth() + 1; // Months are zero-indexed, so we add 1
+    let day: any = today.getDate();
+    const year: any = today.getFullYear();
+
+    // Add leading zeros if necessary
+    if (month < 10) {
+      month = '0' + month;
+    }
+    if (day < 10) {
+      day = '0' + day;
+    }
+
+    return month + '/' + day + '/' + year;
   }
 
   save() {
@@ -109,10 +193,14 @@ export class RoomsComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         payload['name'] = result;
+        this.loading1 = true;
         this.apiService.savePlan(payload).subscribe(res => {
           this._snackBar.open('Plan saved successfully.', 'x', {
             duration: 2000
           });
+          this.loading1 = false;
+
+          this.getPlans();
         })
       }
     });
@@ -137,7 +225,6 @@ export class RoomsComponent implements OnInit {
     // Do something with the selected date
   }
 
-
   maxAllowableBuildingsValueChange() {
     this.maxAllowableRooms = this.maxAllowableBuildings * this.roomsPerBuilding;
 
@@ -147,9 +234,10 @@ export class RoomsComponent implements OnInit {
     this.numberOfDays = Array(this.days).fill(0).map((x, i) => i + 1);
   }
 
-  onPlansChange(){
+  onPlansChange() {
     console.log(this.selectedPlan)
-    if(this.selectedPlan) {
+    if (this.selectedPlan) {
+      this.selectedValues = [];
       this.rooms = this.selectedPlan.total_rooms;
       this.buildings = this.selectedPlan.total_buildings;
       this.days = this.selectedPlan.total_days;
@@ -185,7 +273,6 @@ export class RoomsComponent implements OnInit {
     return 'Room';
   }
 
-
   cellClicked(row: any, column: any) {
     // console.log(row, column)
     this.rowClicked = {
@@ -207,7 +294,6 @@ export class RoomsComponent implements OnInit {
       for (let item of this.selectedValues) {
         if (item.row == row && item.column == column - 1) {
           flag = true;
-          // return 'user ' + item.value;
           return item.value;
         }
       }
@@ -275,9 +361,11 @@ export class RoomsComponent implements OnInit {
       value: user.name,
       user_details: user
     };
-    this.selectedValues.push(obj);
+    if(!this.selectedValues.includes(obj)) {
+      this.selectedValues.push(obj);
+    }
 
-    // console.log(this.selectedValues);
+    console.log(this.selectedValues);
   }
 
 
@@ -344,3 +432,20 @@ export class SaveDialog {
     this.dialogRef.close();
   }
 }
+
+@Component({
+  selector: 'special-reservation',
+  templateUrl: 'special-reservation.html',
+})
+export class SpecialReservationDialog {
+  constructor(
+    public dialogRef: MatDialogRef<SpecialReservationDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+}
+

@@ -1,8 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {ApiService} from "../api.service";
-import {MatDialog} from "@angular/material/dialog";
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {EditUserNameComponent} from "../edit-user-name/edit-user-name.component";
 import {DatePipe} from "@angular/common";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-rooms',
@@ -12,7 +13,7 @@ import {DatePipe} from "@angular/common";
 export class RoomsComponent implements OnInit {
 
   rooms: any = 40;
-  buildings: any = 5;
+  buildings: any = 4;
   days: any = 20;
   roomsPerBuilding: any;
   numberOfRows: number[];
@@ -48,15 +49,18 @@ export class RoomsComponent implements OnInit {
   selected_buildings: any = [];
   rowClicked: any = {};
   selectedValues: any = [];
-  startDate:any = new Date();
+  startDate: any = new Date();
 
 
-  buildings_list:any = [];
-  rooms_list:any = [];
+  buildings_list: any = [];
+  rooms_list: any = [];
+  selectedBuildings: any = [];
+  selectedPlan: any;
+  plans:any = [];
 
 
-  constructor(private apiService: ApiService,
-              public dialog: MatDialog,private datePipe: DatePipe) {
+  constructor(private apiService: ApiService,private _snackBar: MatSnackBar,
+              public dialog: MatDialog, private datePipe: DatePipe) {
     this.roomsPerBuilding = this.rooms / this.buildings;
     this.maxAllowableRooms = this.maxAllowableBuildings * this.roomsPerBuilding;
     this.numberOfRows = Array(this.rooms).fill(0).map((x, i) => i);
@@ -66,19 +70,58 @@ export class RoomsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.apiService.getBuildings().subscribe(res=>{
-    //   this.buildings_list = res;
-    // });
-    // this.apiService.getRooms().subscribe(res=>{
-    //   this.rooms_list = res;
-    //
-    // })
+    this.apiService.getBuildings().subscribe(res => {
+      this.buildings_list = res;
+      this.selectedBuildings = this.buildings_list
+    });
+    this.apiService.getRooms().subscribe(res => {
+      this.rooms_list = res;
+    });
+    this.apiService.getPlans().subscribe(res => {
+      this.plans = res;
+    });
+  }
+
+  isSelectionLimitReached(): boolean {
+    return this.selectedBuildings.length >= this.buildings;
+  }
+
+  save() {
+    let payload = {
+      name: "Plan",
+      createdAt: Date.now(),
+      total_rooms: this.rooms,
+      total_buildings: this.buildings,
+      total_days: this.days,
+      startDate: Date.parse(this.startDate),
+      users_details: this.usersList,
+      pre_assignments: this.selectedValues,
+      allocations: this.room_allocated
+    };
+    console.log(payload);
+
+
+    const dialogRef = this.dialog.open(SaveDialog, {
+      width: '350px',
+      data: {plan_name: ''},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        payload['name'] = result;
+        this.apiService.savePlan(payload).subscribe(res => {
+          this._snackBar.open('Plan saved successfully.', 'x', {
+            duration: 2000
+          });
+        })
+      }
+    });
   }
 
   getColumnDays() {
-    let temp:any = [];
+    let temp: any = [];
 
-    for(let i=0;i<this.days;i++) {
+    for (let i = 0; i < this.days; i++) {
       // let tempDate = this.datePipe.transform(this.startDate, 'MM-dd-yyyy');
       const nextDate = new Date(this.startDate);
       nextDate.setDate(this.startDate.getDate() + i);
@@ -104,6 +147,19 @@ export class RoomsComponent implements OnInit {
     this.numberOfDays = Array(this.days).fill(0).map((x, i) => i + 1);
   }
 
+  onPlansChange(){
+    console.log(this.selectedPlan)
+    if(this.selectedPlan) {
+      this.rooms = this.selectedPlan.total_rooms;
+      this.buildings = this.selectedPlan.total_buildings;
+      this.days = this.selectedPlan.total_days;
+      this.usersList = this.selectedPlan.users_details;
+      this.room_allocated = this.selectedPlan.allocations;
+      this.startDate = new Date(this.selectedPlan.startDate);
+      this.buildingsValueChange();
+    }
+  }
+
   roomsValueChange() {
     this.numberOfRows = Array(this.rooms).fill(0).map((x, i) => i);
     // console.log(this.numberOfRows);
@@ -111,6 +167,7 @@ export class RoomsComponent implements OnInit {
   }
 
   buildingsValueChange() {
+    this.selectedBuildings = [];
     this.roomsPerBuilding = this.rooms / this.buildings;
     this.selected_buildings = [];
     this.maxAllowableBuildingsValueChange();
@@ -120,6 +177,14 @@ export class RoomsComponent implements OnInit {
     this.roomsPerBuilding = this.rooms / this.buildings;
     return Math.ceil(roomNumber / this.roomsPerBuilding) + 1;
   }
+
+  getRoomName(index: any) {
+    if (this.rooms_list) {
+      return this.rooms_list[index - 1]['name'];
+    }
+    return 'Room';
+  }
+
 
   cellClicked(row: any, column: any) {
     // console.log(row, column)
@@ -193,7 +258,7 @@ export class RoomsComponent implements OnInit {
       assignments: this.selectedValues,
       restrictions: restrictions_list
     };
-    this.selectedValues = [];
+    // this.selectedValues = [];
     // console.log(payload);
     this.apiService.get_rooms(payload).subscribe(res => {
       // console.log(res);
@@ -260,5 +325,22 @@ export class RoomsComponent implements OnInit {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+}
+
+
+@Component({
+  selector: 'save-dialog',
+  templateUrl: 'save.html',
+})
+export class SaveDialog {
+  constructor(
+    public dialogRef: MatDialogRef<SaveDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
   }
 }

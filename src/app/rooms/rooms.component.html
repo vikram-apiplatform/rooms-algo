@@ -2,6 +2,16 @@
   <div class="d-flex flex-row">
     <div class="p-2 col-3">
       <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
+        <mat-label>Plans</mat-label>
+        <mat-select [(ngModel)]="selectedPlan" (selectionChange)="onPlansChange()">
+          <mat-option *ngFor="let plan of plans" [value]="plan">
+            {{plan.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="p-2 col-3">
+      <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
         <mat-label>Total Rooms</mat-label>
         <input matInput type="number" [(ngModel)]="rooms" (ngModelChange)="roomsValueChange()" required>
       </mat-form-field>
@@ -19,6 +29,7 @@
       </mat-form-field>
     </div>
 
+
     <div class="p-2 col-3">
       <mat-form-field class="example-form-field" appearance="outline" style="width:100%">
         <mat-label>No. of Days</mat-label>
@@ -32,7 +43,8 @@
 
       <mat-form-field appearance="outline" style="width:100%">
         <mat-label>Starting Date</mat-label>
-        <input matInput [matDatepicker]="picker" placeholder="MM/DD/YYYY" [(ngModel)]="startDate" (dateChange)="onDateChange($event)">
+        <input matInput [matDatepicker]="picker" placeholder="MM/DD/YYYY" [(ngModel)]="startDate"
+               (dateChange)="onDateChange($event)">
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
@@ -54,6 +66,9 @@
     <div class="p- col-3" style="text-align: end">
       <button style="margin-top: 10px;margin-left: 5px;" mat-raised-button color="primary" (click)="assignRoom()">
         Assign
+      </button>
+      <button style="margin-top: 10px;margin-left: 5px;" mat-raised-button color="primary"
+              (click)="save()">Save
       </button>
       <button style="margin-top: 10px;margin-left: 5px;" mat-raised-button color="primary"
               (click)="room_allocated = [];selected_buildings=[]">Clear
@@ -83,12 +98,12 @@
         <tr *ngIf="rowIndex % roomsPerBuilding === 0">
           <td [attr.rowspan]="roomsPerBuilding">
             Building {{getBuildingNumber(rowIndex)}} </td>
-          <td>Room {{rowIndex + 1}}</td>
+          <td> {{getRoomName(rowIndex + 1)}}</td>
           <td *ngFor="let day of numberOfDays" (click)="cellClicked(rowIndex, day)"
               [matMenuTriggerFor]="menu"> {{getAllocatedValue(rowIndex, day)}}</td>
         </tr>
         <tr *ngIf="rowIndex % roomsPerBuilding !== 0">
-          <td> Room {{ rowIndex + 1 }}</td>
+          <td> {{getRoomName(rowIndex + 1)}}</td>
           <td *ngFor="let day of numberOfDays" (click)="cellClicked(rowIndex, day)"
               [matMenuTriggerFor]="menu">  {{getAllocatedValue(rowIndex, day)}}
           </td>
@@ -104,3 +119,5 @@
     </mat-menu>
   </div>
 </div>
+
+

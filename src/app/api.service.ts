@@ -65,4 +65,34 @@ export class ApiService {
     return this.http.get(url, options)
       .pipe(map(res => res));
   }
+
+  savePlan(payload: any) {
+    const options = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'pkey': '3fbbb8bc5a969f503fdb66e7d90509d6',
+        'apikey': '7xR2sYhqRAdfhhyu6jMo9E9hi4fRazuw',
+        'Access-Control-Allow-Origin': '*',
+        'observe': 'response'
+      })
+    };
+    const url = 'https://dev-vikram.gateway.apiplatform.io/v1/roomPlans';
+    return this.http.post(url, payload, options)
+      .pipe(map(res => res));
+  }
+
+  getPlans() {
+    const options = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'pkey': '3fbbb8bc5a969f503fdb66e7d90509d6',
+        'apikey': '7xR2sYhqRAdfhhyu6jMo9E9hi4fRazuw',
+        'Access-Control-Allow-Origin': '*',
+        'observe': 'response'
+      })
+    };
+    const url = 'https://dev-vikram.gateway.apiplatform.io/v1/roomPlans';
+    return this.http.get(url, options)
+      .pipe(map(res => res));
+  }
 }

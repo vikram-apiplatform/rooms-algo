@@ -3,7 +3,7 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {RoomsComponent} from './rooms/rooms.component';
+import {RoomsComponent, SaveDialog} from './rooms/rooms.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatButtonModule} from "@angular/material/button";
 import {MatInputModule} from "@angular/material/input";
@@ -22,12 +22,14 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatDatepickerModule} from "@angular/material/datepicker";
 import {MatNativeDateModule} from "@angular/material/core";
 import {DatePipe} from "@angular/common";
+import {MatSidenavModule} from "@angular/material/sidenav";
 
 @NgModule({
   declarations: [
     AppComponent,
     RoomsComponent,
-    EditUserNameComponent
+    EditUserNameComponent,
+    SaveDialog
   ],
   imports: [
     BrowserModule,
@@ -47,9 +49,10 @@ import {DatePipe} from "@angular/common";
     MatListModule,
     MatSelectModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatSidenavModule
   ],
-  providers: [DatePipe],
+  providers: [DatePipe, SaveDialog],
   bootstrap: [AppComponent]
 })
 export class AppModule {

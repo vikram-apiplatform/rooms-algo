@@ -31,7 +31,7 @@ export class ApiService {
   }
 
   get_rooms(payload: any) {
-    const url = 'http://127.0.0.1:5003/get_rooms';
+    const url = 'https://servicesv2.apiplatform.io/assign-rooms';
     return this.http.post(url, payload, this.httpOptions)
       .pipe(map(res => res));
   }

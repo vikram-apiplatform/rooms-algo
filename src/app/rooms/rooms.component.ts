@@ -14,6 +14,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 export class RoomsComponent implements OnInit {
 
   rooms: any = 40;
+  names = ['வடக்கு','மேற்கு','கிழக்கு','தெற்கு'];
   buildings: any = 4;
   days: any = 20;
   roomsPerBuilding: any;
@@ -263,6 +264,11 @@ export class RoomsComponent implements OnInit {
   getBuildingNumber(roomNumber: any) {
     this.roomsPerBuilding = this.rooms / this.buildings;
     return Math.ceil(roomNumber / this.roomsPerBuilding) + 1;
+  }
+
+  getBuildingName(roomNumber: any) {
+    this.roomsPerBuilding = this.rooms / this.buildings;
+    return  this.names[Math.ceil(roomNumber / this.roomsPerBuilding)];
   }
 
   getRoomName(index: any) {

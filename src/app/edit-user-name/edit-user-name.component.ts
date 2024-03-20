@@ -19,6 +19,8 @@ export class EditUserNameComponent implements OnInit {
   editFlag = false;
   editIndex: any;
 
+  names = ['வடக்கு','மேற்கு','கிழக்கு','தெற்கு'];
+
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
               public dialogRef: MatDialogRef<EditUserNameComponent>, private _snackBar: MatSnackBar) {
     if (data) {
@@ -46,6 +48,18 @@ export class EditUserNameComponent implements OnInit {
 
   removeUser(index: any) {
     this.usersList.splice(index, 1);
+  }
+
+  getName(index:any) {
+    return this.names[index-1];
+  }
+
+  getNamesList(list:any) {
+    let tempName:any='';
+    for(let temp of list) {
+      tempName = tempName + this.names[temp - 1] + ', ';
+    }
+    return tempName;
   }
 
   isSelectionLimitReached(): boolean {

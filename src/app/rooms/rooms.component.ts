@@ -6,7 +6,6 @@ import {DatePipe} from "@angular/common";
 import {MatSnackBar} from "@angular/material/snack-bar";
 
 
-
 @Component({
   selector: 'app-rooms',
   templateUrl: './rooms.component.html',
@@ -87,7 +86,7 @@ export class RoomsComponent implements OnInit {
     this.getPlans();
   }
 
-  getPlans(){
+  getPlans() {
     this.apiService.getPlans().subscribe(res => {
       this.plans = res;
     });
@@ -361,7 +360,7 @@ export class RoomsComponent implements OnInit {
       value: user.name,
       user_details: user
     };
-    if(!this.selectedValues.includes(obj)) {
+    if (!this.selectedValues.includes(obj)) {
       this.selectedValues.push(obj);
     }
 
@@ -422,10 +421,8 @@ export class RoomsComponent implements OnInit {
   templateUrl: 'save.html',
 })
 export class SaveDialog {
-  constructor(
-    public dialogRef: MatDialogRef<SaveDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {
+  constructor(public dialogRef: MatDialogRef<SaveDialog>,
+              @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   onNoClick(): void {
@@ -433,15 +430,14 @@ export class SaveDialog {
   }
 }
 
+
 @Component({
   selector: 'special-reservation',
   templateUrl: 'special-reservation.html',
 })
 export class SpecialReservationDialog {
-  constructor(
-    public dialogRef: MatDialogRef<SpecialReservationDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {
+  constructor(public dialogRef: MatDialogRef<SpecialReservationDialog>,
+              @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   onNoClick(): void {

@@ -64,7 +64,9 @@
 
     <div class="p- col-3" style="text-align: end">
       <button style="margin-top: 10px;margin-left: 5px;" mat-raised-button color="primary" (click)="assignRoom()">
-        Assign
+
+        <span *ngIf="!loading2">Assign</span>
+        <span *ngIf="loading2" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
       </button>
       <button style="margin-top: 10px;margin-left: 5px;" mat-raised-button color="primary"
               (click)="save()">

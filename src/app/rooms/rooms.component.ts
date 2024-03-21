@@ -59,6 +59,7 @@ export class RoomsComponent implements OnInit {
   plans: any = [];
   loading = false;
   loading1 = false;
+  loading2 = false;
 
   @ViewChild('excelTable', {static: false}) excelTable: any;
 
@@ -351,11 +352,18 @@ export class RoomsComponent implements OnInit {
     };
     // this.selectedValues = [];
     // console.log(payload);
+    this.loading2 = true;
     this.apiService.get_rooms(payload).subscribe(res => {
       // console.log(res);
+      this.loading2 = false;
       if (res) {
         this.room_allocated = res;
       }
+    },err =>{
+      this.loading2 = false;
+      this._snackBar.open('Error, Please try again.', 'x', {
+        duration: 2000
+      });
     });
   }
 

@@ -76,7 +76,7 @@
       <button style="margin-top: 10px;margin-left: 5px;" mat-raised-button color="primary"
               (click)="room_allocated = [];selected_buildings=[];selectedValues=[];">Clear
       </button>
-      <button style="margin-top: 10px;margin-left: 5px;" mat-raised-button color="primary" (click)="exportToCsv()">
+      <button style="margin-top: 10px;margin-left: 5px;" mat-raised-button color="primary" (click)="convetToPDF()">
         Print
       </button>
 
@@ -87,7 +87,7 @@
 
   </div>
   <div id="htmlData" *ngIf="!loading">
-    <table #excelTable class="table table-striped table-bordered" style="width: max-content;">
+    <table #excelTable class="table table-striped table-bordered" style="width: max-content;" id="contentToConvert">
       <thead>
       <tr>
         <th scope="col">மண்டலம்</th>

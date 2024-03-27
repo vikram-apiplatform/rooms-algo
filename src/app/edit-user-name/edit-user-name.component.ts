@@ -1,6 +1,6 @@
-import {Component, Inject, Input, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
-import {MatSnackBar} from "@angular/material/snack-bar";
+import { Component, Inject, Input, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-edit-user-name',
@@ -10,6 +10,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 export class EditUserNameComponent implements OnInit {
   total_buildings: any = 0;
   username: any;
+  phone: any;
   usersList: any = [];
   allowale_buildings = 0;
   allowable_rooms = 0;
@@ -19,10 +20,10 @@ export class EditUserNameComponent implements OnInit {
   editFlag = false;
   editIndex: any;
 
-  names = ['வடக்கு','மேற்கு','கிழக்கு','தெற்கு'];
+  names = ['வடக்கு', 'மேற்கு', 'கிழக்கு', 'தெற்கு'];
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
-              public dialogRef: MatDialogRef<EditUserNameComponent>, private _snackBar: MatSnackBar) {
+    public dialogRef: MatDialogRef<EditUserNameComponent>, private _snackBar: MatSnackBar) {
     if (data) {
       this.total_buildings = data.total_buildings;
       this.allowale_buildings = this.total_buildings;
@@ -41,6 +42,7 @@ export class EditUserNameComponent implements OnInit {
     this.editFlag = true;
     this.editIndex = i;
     this.username = this.usersList[i]['name'];
+    this.phone = this.usersList[i]['phone'];
     this.allowale_buildings = this.usersList[i]['max_allowable_buildings'];
     this.selectedBuildings = this.usersList[i]['selected_buildings'];
     this.allowable_rooms = this.usersList[i]['max_allowable_buildings'] * this.rooms_per_building;
@@ -50,13 +52,13 @@ export class EditUserNameComponent implements OnInit {
     this.usersList.splice(index, 1);
   }
 
-  getName(index:any) {
-    return this.names[index-1];
+  getName(index: any) {
+    return this.names[index - 1];
   }
 
-  getNamesList(list:any) {
-    let tempName:any='';
-    for(let temp of list) {
+  getNamesList(list: any) {
+    let tempName: any = '';
+    for (let temp of list) {
       tempName = tempName + this.names[temp - 1] + ', ';
     }
     return tempName;
@@ -67,7 +69,7 @@ export class EditUserNameComponent implements OnInit {
   }
 
   range(start: number, end: number): number[] {
-    return Array.from({length: end - start + 1}, (_, i) => start + i);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }
 
   maxAllowableBuildingsValueChange() {
@@ -77,12 +79,14 @@ export class EditUserNameComponent implements OnInit {
 
   update() {
     this.usersList[this.editIndex]['name'] = this.username;
+    this.usersList[this.editIndex]['phone'] = this.phone;
     this.usersList[this.editIndex]['max_allowable_buildings'] = this.allowale_buildings;
     this.usersList[this.editIndex]['selected_buildings'] = this.selectedBuildings;
     this.usersList[this.editIndex]['max_allowable_rooms'] = this.allowable_rooms;
     this.editFlag = false;
     this.editIndex = null
     this.username = '';
+    this.phone = '';
   }
 
   add() {
@@ -90,6 +94,7 @@ export class EditUserNameComponent implements OnInit {
       if (!this.usersList.includes(this.username)) {
         let obj = {
           name: this.username,
+          phone: this.phone,
           max_allowable_buildings: this.allowale_buildings,
           selected_buildings: this.selectedBuildings,
           max_allowable_rooms: this.allowable_rooms
@@ -99,11 +104,15 @@ export class EditUserNameComponent implements OnInit {
           duration: 2000
         });
         this.username = '';
+        this.phone = '';
+
       } else {
         this._snackBar.open('User already added', 'x', {
           duration: 2000
         });
         this.username = '';
+        this.phone = '';
+
       }
     } else {
       this._snackBar.open('Enter user name', 'x', {
@@ -115,7 +124,7 @@ export class EditUserNameComponent implements OnInit {
   }
 
   save() {
-    this.dialogRef.close({userList: this.usersList});
+    this.dialogRef.close({ userList: this.usersList });
 
   }
   cancel() {
@@ -126,7 +135,7 @@ export class EditUserNameComponent implements OnInit {
 
 
   closeDialog() {
-    this.dialogRef.close({userList: this.usersList});
+    this.dialogRef.close({ userList: this.usersList });
   }
 
 }

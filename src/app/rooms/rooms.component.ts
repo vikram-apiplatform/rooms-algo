@@ -26,6 +26,7 @@ export class RoomsComponent implements OnInit {
   usersList: any = [
     {
       "name": "Vikram",
+      "phone":"",
       "max_allowable_buildings": 4,
       "selected_buildings": [
         1,
@@ -37,6 +38,7 @@ export class RoomsComponent implements OnInit {
     },
     {
       "name": "Saldin",
+      "phone":"",
       "max_allowable_buildings": 2,
       "selected_buildings": [
         2,

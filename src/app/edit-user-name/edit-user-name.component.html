@@ -13,6 +13,10 @@
       <input matInput type="text" [(ngModel)]="username" required (keyup.enter)="add()">
     </mat-form-field>
     <mat-form-field class="col-3" appearance="outline">
+      <mat-label>தொலைபேசி எண்</mat-label>
+      <input matInput type="text" [(ngModel)]="phone" required>
+    </mat-form-field>
+    <mat-form-field class="col-3" appearance="outline">
       <mat-label>அதிகபட்ச மண்டலம்</mat-label>
       <input matInput type="number" [(ngModel)]="allowale_buildings" [max]="total_buildings"
              (ngModelChange)="maxAllowableBuildingsValueChange()" required>
@@ -43,6 +47,7 @@
       <thead>
       <tr>
         <th scope="col">பேச்சாளர் பெயர்</th>
+        <th scope="col">தொலைபேசி எண்</th>
         <th scope="col">அதிகபட்ச மண்டலம்</th>
         <th scope="col">அதிகபட்ச தொகுதி</th>
         <th scope="col">மண்டலங்கள்</th>
@@ -52,6 +57,7 @@
       <tbody>
       <tr *ngFor="let user of usersList; let i=index">
         <td>{{i+1}}. {{user.name}}</td>
+        <td>{{user.phone}}</td>
         <td>{{user.max_allowable_buildings}}</td>
         <td>{{user.max_allowable_rooms}}</td>
         <td>{{getNamesList(user.selected_buildings)}}</td>

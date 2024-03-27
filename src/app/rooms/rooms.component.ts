@@ -1,9 +1,12 @@
-import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
-import {ApiService} from "../api.service";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material/dialog";
-import {EditUserNameComponent} from "../edit-user-name/edit-user-name.component";
-import {DatePipe} from "@angular/common";
-import {MatSnackBar} from "@angular/material/snack-bar";
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
+import { ApiService } from "../api.service";
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { EditUserNameComponent } from "../edit-user-name/edit-user-name.component";
+import { DatePipe } from "@angular/common";
+import { MatSnackBar } from "@angular/material/snack-bar";
+
+import * as jspdf from 'jspdf';
+import html2canvas from 'html2canvas';
 
 
 @Component({
@@ -14,7 +17,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 export class RoomsComponent implements OnInit {
 
   rooms: any = 40;
-  names = ['வடக்கு','மேற்கு','கிழக்கு','தெற்கு'];
+  names = ['வடக்கு', 'மேற்கு', 'கிழக்கு', 'தெற்கு'];
   buildings: any = 4;
   days: any = 20;
   roomsPerBuilding: any;
@@ -26,6 +29,7 @@ export class RoomsComponent implements OnInit {
   usersList: any = [
     {
       "name": "Vikram",
+      "phone": "",
       "max_allowable_buildings": 4,
       "selected_buildings": [
         1,
@@ -37,6 +41,7 @@ export class RoomsComponent implements OnInit {
     },
     {
       "name": "Saldin",
+      "phone": "",
       "max_allowable_buildings": 2,
       "selected_buildings": [
         2,
@@ -61,11 +66,11 @@ export class RoomsComponent implements OnInit {
   loading1 = false;
   loading2 = false;
 
-  @ViewChild('excelTable', {static: false}) excelTable: any;
+  @ViewChild('excelTable', { static: false }) excelTable: any;
 
 
   constructor(private apiService: ApiService, private _snackBar: MatSnackBar,
-              public dialog: MatDialog, private datePipe: DatePipe) {
+    public dialog: MatDialog, private datePipe: DatePipe) {
     this.roomsPerBuilding = this.rooms / this.buildings;
     this.maxAllowableRooms = this.maxAllowableBuildings * this.roomsPerBuilding;
     this.numberOfRows = Array(this.rooms).fill(0).map((x, i) => i);
@@ -138,7 +143,7 @@ export class RoomsComponent implements OnInit {
     });
 
     // Create a Blob object with CSV content
-    let blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+    let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 
     // Create a temporary anchor element
     let link = document.createElement('a');
@@ -152,6 +157,23 @@ export class RoomsComponent implements OnInit {
     } else {
       console.error('Your browser does not support the HTML5 download attribute.');
     }
+  }
+
+  convetToPDF() {
+    var data: any = document.getElementById('contentToConvert');
+    html2canvas(data).then(canvas => {
+      // Few necessary setting options
+      var imgWidth = 208;
+      var pageHeight = 295;
+      var imgHeight = canvas.height * imgWidth / canvas.width;
+      var heightLeft = imgHeight;
+
+      const contentDataURL = canvas.toDataURL('image/png')
+      let pdf = new jspdf.jsPDF('p', 'mm', 'a4'); 
+      var position = 0;
+      pdf.addImage(contentDataURL, 'PNG', 0, position, imgWidth, imgHeight)
+      pdf.save('Allocation.pdf'); 
+    });
   }
 
   getCurrentDate() {
@@ -188,7 +210,7 @@ export class RoomsComponent implements OnInit {
 
     const dialogRef = this.dialog.open(SaveDialog, {
       width: '350px',
-      data: {plan_name: ''},
+      data: { plan_name: '' },
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -269,7 +291,7 @@ export class RoomsComponent implements OnInit {
 
   getBuildingName(roomNumber: any) {
     this.roomsPerBuilding = this.rooms / this.buildings;
-    return  this.names[Math.ceil(roomNumber / this.roomsPerBuilding)];
+    return this.names[Math.ceil(roomNumber / this.roomsPerBuilding)];
   }
 
   getRoomName(index: any) {
@@ -359,7 +381,7 @@ export class RoomsComponent implements OnInit {
       if (res) {
         this.room_allocated = res;
       }
-    },err =>{
+    }, err => {
       this.loading2 = false;
       this._snackBar.open('Error, Please try again.', 'x', {
         duration: 2000
@@ -416,7 +438,7 @@ export class RoomsComponent implements OnInit {
   downloadTable() {
     const table: any = document.querySelector('table');
     const html = table.outerHTML;
-    const blob = new Blob([html], {type: 'text/html'});
+    const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement('a');
@@ -436,7 +458,7 @@ export class RoomsComponent implements OnInit {
 })
 export class SaveDialog {
   constructor(public dialogRef: MatDialogRef<SaveDialog>,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
+    @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   onNoClick(): void {
@@ -451,7 +473,7 @@ export class SaveDialog {
 })
 export class SpecialReservationDialog {
   constructor(public dialogRef: MatDialogRef<SpecialReservationDialog>,
-              @Inject(MAT_DIALOG_DATA) public data: any) {
+    @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   onNoClick(): void {
